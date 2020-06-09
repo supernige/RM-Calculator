@@ -66,8 +66,8 @@ class FatigueStrength {
             
             this._altStress = altStress;
             this._meanStress = meanStress;
-            this._rRatio = (this._meanStress - this._altStress) / (this._meanStress + this._altStress);
-            this._maxStress = this._meanStress + this._altStress;
+            this._rRatio = this.RFromMeanAlt(this._meanStress, this._altStress);
+            this._maxStress = this.MaxFromAltMean(this._altStress, this._meanStress);
             console.log(`result: .alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, max: ${this._maxStress}.`);
 
         } else if (Number.isFinite(rRatio) && Number.isFinite(maxStress)) {
