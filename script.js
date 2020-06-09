@@ -31,7 +31,7 @@ class FatigueStrength {
         this.kt = _kt;
         this.halfPkPk = _halfPkPk;
         
-        console.log(`initial values passed: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`)
+        // console.log(`initial values passed: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`)
         
         // this ensures that regardless of how it is inputted half-waveform amplitude is what is stored
         if (_halfPkPk = false && altStress !== null) {
@@ -52,7 +52,7 @@ class FatigueStrength {
             }
         }
 
-        console.log(`0-pk / net section values: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`)
+        // console.log(`0-pk / net section values: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`)
 
         
         // six logic functions to work out how to calculate remaining 2 properties from the two already entered
