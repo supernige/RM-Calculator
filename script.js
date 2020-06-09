@@ -61,57 +61,53 @@ class FatigueStrength {
         // each if statement checks that a particualr pair of parameters contain actual numbers
         // depending on which two are provided the maths is different on how to get the other two
         // there are 6 maths functions that are re-used in various sequences rather than write bespoke code for each,
-        // I tried to give them names that explain what they are doing so it is readable.
+
         if (Number.isFinite(altStress) && Number.isFinite(meanStress)) {
             
-            // first example: these first two were passed so can go straight in the property
             this._altStress = altStress;
             this._meanStress = meanStress;
-            // next the function RfromMeanAlt works out the R ratio from the two values we started with
-            this._rRatio = this.RFromMeanAlt(this._meanStress, this._altStress);
-            // then the last parameter can be calulated from one of the original two and the one we just worked out
-            this._maxStress = this.MaxFromMeanR(this._meanStress, this._rRatio);
-            console.log(`result: .alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, max ${this._maxStress}.`)
-            // this logic repeats but the maths is different each time
-        } else if (Number.isFinite(meanStress) && Number.isFinite(rRatio)) {
-            
-            this._meanStress = meanStress;
-            this._rRatio = rRatio;
-            this._maxStress = this.MaxFromMeanR(this._meanStress, this._rRatio);
-            this._altStress = this.AltFromMaxMean(this._maxStress, this._meanStress);
-            console.log(`result: alt: ${this._altStress}, .mean: ${this._meanStress}, .R: ${this._rRatio}, max ${this._maxStress}.`)
+            this._rRatio = (this._meanStress - this._altStress) / (this._meanStress + this._altStress);
+            this._maxStress = this._meanStress + this._altStress;
+            console.log(`result: .alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, max: ${this._maxStress}.`);
 
         } else if (Number.isFinite(rRatio) && Number.isFinite(maxStress)) {
             
             this._rRatio = rRatio;
             this._maxStress = maxStress;
-            this._meanStress = this.MeanFromMaxR(this._maxStress, this._rRatio);
-            this._altStress = this.AltFromMaxMean(this._maxStress, this._meanStress);
-            console.log(`result: alt: ${this._altStress}, mean: ${this._meanStress}, .R: ${this._rRatio}, .max ${this._maxStress}.`)
+            this._altStress = this.AltFrormMaxR(this._maxStress, this._rRatio);
+            this._meanStress = this.MeanFromMaxAlt(this._maxStress, this._altStress);
+            console.log(`result: alt: ${this._altStress}, mean: ${this._meanStress}, .R: ${this._rRatio}, .max: ${this._maxStress}.`);
 
         } else if (Number.isFinite(altStress) && Number.isFinite(maxStress)) {
             
             this._altStress = altStress;
             this._maxStress = maxStress;
-            this._meanStress = this.MeanFromMaxAlt(this._maxStress, this._altStress);
-            this._rRatio = this.RFromMeanAlt(this._meanStress, this._altStress);
-            console.log(`result: .alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, .max ${this._maxStress}.`)
+            this._rRatio = this.RFromAltMax(this._altStress, this._maxStress);
+            this._meanStress = this.MeanFromMaxR(this._maxStress, this._rRatio);
+            console.log(`result: .alt: ${this._altStress}, mean: ${this._meanStress}, R: ${this._rRatio}, .max ${this._maxStress}.`);
 
         } else if (Number.isFinite(altStress) && Number.isFinite(rRatio)) {
             
             this._altStress = altStress;
             this._rRatio = rRatio;
             this._maxStress = this.MaxFromAltR(this._altStress, this._rRatio);
-            this._meanStress = this.MeanFromMaxAlt(this._maxStress, this._altStress);
-            console.log(`result: .alt: ${this._altStress}, mean: ${this._meanStress}, .R: ${this._rRatio}, max ${this._maxStress}.`)
+            this._meanStress = this.MeanFromMaxR(this._maxStress, this._rRatio);
+            console.log(`result: .alt: ${this._altStress}, mean: ${this._meanStress}, .R: ${this._rRatio}, max ${this._maxStress}.`);
 
         } else if (Number.isFinite(meanStress) && Number.isFinite(maxStress)) {
             
             this._meanStress = meanStress;
             this._maxStress = maxStress;
-            this._meanStress = this.MeanFromMaxAlt(this._maxStress, this._altStress);
+            this._altStress = this.AltFromMaxMean(this._maxStress, this._meanStress);
             this._rRatio = this.RFromMeanAlt(this._meanStress, this._altStress);
-            console.log(`result: alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, .max ${this._maxStress}.`)
+            console.log(`result: alt: ${this._altStress}, .mean: ${this._meanStress}, R: ${this._rRatio}, .max ${this._maxStress}.`);
+
+        } else if (Number.isFinite(meanStress) && Number.isFinite(rRatio)) {
+            
+            this._meanStress = meanStress;
+            this._rRatio = rRatio;
+            // this cant be done without solving by iteration and I don't think I want to get into that.
+            console.log(`result: alt: Not possible, .mean: ${this._meanStress}, .R: ${this._rRatio}, max: Not possible.`);
 
         } else {
             // if it doesn't work just stick all the values passed into the properties and we'll think of something later
@@ -119,32 +115,39 @@ class FatigueStrength {
             this._meanStress = meanStress;
             this._rRatio = rRatio;
             this._maxStress = maxStress;
-            console.log(`no pairing found, values passed to logic block: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`)
+            console.log(`no pairing found, values passed to logic block: alt: ${altStress}, mean: ${meanStress}, r: ${rRatio}, max ${maxStress}.`);
         
         }
         
     }
 
     // maths functions that the above re-uses in different combinations
-    RFromMeanAlt(mean, alt) {
-        return (mean - alt)/(mean + alt)
+    RFromMeanAlt (mean, alt) {
+        return (mean - alt)/(mean + alt);
     }
-    MeanFromMaxR(max, r) {
-        return max * (1 + r) / 2
+    MeanFromMaxR (max, r) {
+        return max * (1 + r) / 2;
     }
-    MaxFromMeanR(mean, r) {
-        return (2 * mean)/(1 + r)
+    AltFrormMaxR (max, r) {
+        return max * (1 - r) / 2;
     }
-    MaxFromAltR(alt, r) {
-        return (2 * alt)/(1 - r) 
+    RFromAltMax (alt, max) {
+        return 1 - ((2 * alt) / max);
     }
-    AltFromMaxMean(max, mean) {
-        return max - mean
+    MaxFromAltR (alt, r) {
+        return (2 * alt) / (1 - r);
     }
-    MeanFromMaxAlt(max, alt) {
-        return max - alt
+    AltFromMaxMean (max, mean) {
+        return max - mean;
     }
-    
+    MeanFromMaxAlt (max, alt) {
+        return max - alt;
+    }
+    MaxFromAltMean (alt, mean) {
+        return alt + mean;
+    }
+
+
     // getters
     // at this stage I just want these to return the data to the format it was passed in in but later will look at implementing 
     // returning what format the user actually wants.
@@ -152,7 +155,7 @@ class FatigueStrength {
         if (this.peakIn = true) {
             return this._altStress *= this.kt;
         } else {
-            return this._altStress
+            return this._altStress;
         }
     }
     
@@ -160,7 +163,7 @@ class FatigueStrength {
         if (this.peakIn = true) {
             return this._meanStress *= this.kt;
         } else {
-            return this._meanStress
+            return this._meanStress;
         }
     }
     
@@ -168,14 +171,24 @@ class FatigueStrength {
         if (this.peakIn = true) {
             return this._maxStress *= this.kt;
         } else {
-            return this._maxStress
+            return this._maxStress;
         }
     }
 
-    // R ratio isn't modified so it can go straight in a property without a getter I suppose.
+    // R ratio isn't modified so it can go straight in a property without a getter.
 
 
 }
 
-let F1 = new FatigueStrength(null, null, 0.1, 300);
+let F1 = new FatigueStrength(250, 0, null, null); // should return R = -1 and max = 250
 console.log(F1)
+let F2 = new FatigueStrength(null, 200, 0.1, null); // should not be possible
+console.log(F2)
+let F3 = new FatigueStrength(null, null, 0.1, 300); // should be alt = 135 and mean = 165
+console.log(F3)
+let F4 = new FatigueStrength(250, null, null, 300); // should be a negative R and mean = 50
+console.log(F4)
+let F5 = new FatigueStrength(100, null, 0.1, null); 
+console.log(F5)
+let F6 = new FatigueStrength(null, 150, null, 300); // should be alt = 150 and R = 0
+console.log(F6)
